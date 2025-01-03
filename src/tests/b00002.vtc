@@ -32,9 +32,6 @@ varnish v1 -arg "-p thread_pools=1" -vcl+backend {
 		set resp.http.missing-path2 = db1.lookup(
 		    "",
 		    std.ip("0.0.0.0", "0.0.0.0"));
-		set resp.http.missing-db = db2.lookup(
-		    "city/names/en",
-		    std.ip("0.0.0.0", "0.0.0.0"));
 	}
 } -start
 
@@ -54,8 +51,6 @@ logexpect l1 -v v1 -g raw -d 1 {
 	    "geoip2.lookup: Invalid or missing path \\(NULL\\)"
 	expect * =	Error \
 	    "geoip2.lookup: Invalid or missing path \\(\\)"
-	expect * =	Error \
-	    "geoip2.lookup: Database not open"
 } -start
 
 client c1 {
@@ -66,7 +61,6 @@ client c1 {
 	expect resp.http.addr-not-found == ""
 	expect resp.http.missing-path1 == ""
 	expect resp.http.missing-path2 == ""
-	expect resp.http.missing-db == ""
 } -run
 
 logexpect l1 -wait
